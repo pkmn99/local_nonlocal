@@ -22,10 +22,10 @@ def my_ttest_3d(df1,df2,dim='time'):
                output_core_dims=[[],[]],vectorize=True)
     return f,p
 
-def load_data(exp,exp0='F2000climo_ctl',var_group='clm2',time_scale='year'):
+def load_data(exp,exp0='F2000climo_ctl',var_group='clm2',time_scale='yearmean'):
     # Load annual model output
-    d0y=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%smean.nc'%(exp0,var_group,time_scale))#,decode_times=False)
-    d1y=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%smean.nc'%(exp,var_group,time_scale))#,decode_times=False)
+    d0y=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%s.nc'%(exp0,var_group,time_scale))
+    d1y=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%s.nc'%(exp,var_group,time_scale))
     
     # # # Seasonal 
     # # d0s=xr.open_dataset('../output_2.1.3/35years/F2000climo_f19_g16.%s.h0.0001-0035-seasmean.nc'%var_group)
@@ -90,7 +90,6 @@ def make_plot(exp,var,time_scale='year',var_group='clm2',exp0='F2000climo_ctl'):
     ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.PlateCarree(),
                       frameon=False)
     if time_scale in ['DJF','MAM','JJA','SON']:
-        
         plot_change_map(d0y[var][d0y.time.dt.season==time_scale], 
                         d1y[var][d1y.time.dt.season==time_scale],
                         ax, minmax=[])
