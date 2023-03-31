@@ -4,7 +4,7 @@ import numpy as np
 Calcualte local and nonlocal effect based on subgrid simulation
 """
 
-# Calculate weigted mean across based on pft fractions
+# Calculate weigted mean based on pft fractions
 def weighted_mean(da, w):
     d = da.copy().fillna(0)
     dw = (d.values * w.values).sum(axis=0)/w.values.sum(axis=0)
@@ -27,9 +27,9 @@ def save_data(var='TSA'):
         d1y=d1[var].mean(dim='time')
 
     # Local impact from subgrid differences: pft 1:11 forest+shrub, pft12:15 grass
-    f =  weighted_mean(d1y[1:11], lc.PCT_NAT_PFT[1:11])
-    nf =  weighted_mean(d1y[11:15], lc.PCT_NAT_PFT[11:15])
-    f0 =  weighted_mean(d0y[1:11], lc.PCT_NAT_PFT[1:11])
+    f =  weighted_mean(d1y[1:12], lc.PCT_NAT_PFT[1:12])#forest indef run 
+    nf =  weighted_mean(d1y[12:15], lc.PCT_NAT_PFT[12:15])#nonforest in def run 
+    f0 =  weighted_mean(d0y[1:12], lc.PCT_NAT_PFT[1:12]) #forest in control run
     
     d_l=nf-f # local impact
     d_nl=f-f0 # nonlocal impact
