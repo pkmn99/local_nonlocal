@@ -6,12 +6,17 @@ def load_data(exp,var_group='clm2',time_scale='monthly'):
     d=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%s.nc'%(exp,var_group,time_scale))
     return d
 
-def save_data():
-    g_cam = load_data('F2000climo_Allgrass',var_group='cam',time_scale='monthly')
-    c_cam = load_data('F2000climo_ctl',var_group='cam',time_scale='monthly')
+def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
+    # Get the deforestation grid box
+    lc0 = xr.open_dataset('../data/inputdata/surfdata_1.9x2.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190304_noirr.nc')
+    # forest change fraction
+    def_frac=lc0.PCT_NAT_PFT[1:12,:,:].sum(dim='natpft')
+
+    g_cam = load_data(exp1,var_group='cam',time_scale='monthly')
+    c_cam = load_data(exp0,var_group='cam',time_scale='monthly')
     
-    g_clm = load_data('F2000climo_Allgrass',var_group='clm2',time_scale='monthly')
-    c_clm = load_data('F2000climo_ctl',var_group='clm2',time_scale='monthly')
+    g_clm = load_data(exp1,var_group='clm2',time_scale='monthly')
+    c_clm = load_data(exp0,var_group='clm2',time_scale='monthly')
     
     # Calculate Ts from outgoing longwave radiation
     B = 5.670367*10**-8 # Stefan-Boltzmann constant
@@ -91,7 +96,9 @@ def save_data():
     
     dts=dts1+dts2+dts3
 
-    local=dts.where((dts>ts_diff.quantile(0.001))&(dts<ts_diff.quantile(0.999))).mean(dim='time') # remove outliers
+    local=dts.where((dts>ts_diff.quantile(0.001))&(dts<ts_diff.quantile(0.999))&(ra>0)&(bo>0)).mean(dim='time') # remove outliers
+    # multiply deforestation fraction
+    local = local * def_frac.values/100
     nonlocal_tair=dts4.mean(dim='time')
     nonlocal_tsc=ts_diff.mean(dim='time')-local
     
@@ -102,8 +109,11 @@ def save_data():
     d_final['TSc_nonlocal'].attrs = {'long name': 'calculated surface temperature from FIRE',
                                      'units':'K'}
     d_final['Tair_nonlocal'].attrs = tair_c.attrs
-    d_final.to_netcdf('../data/result/ibm.TSc.local_nonlocal.nc')
+    if exp0=='F2000climo_ctl':
+        d_final.to_netcdf('../data/result/ibm.TSc.local_nonlocal20250208.nc')
+    if exp0=='F2000climo_Allgrass':
+        d_final.to_netcdf('../data/result/ibm_r.TSc.local_nonlocal20250208.nc')
     print('data saved')
 
 if __name__=="__main__":
-    save_data()
+    save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass')
