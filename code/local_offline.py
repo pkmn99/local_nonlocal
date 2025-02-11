@@ -10,9 +10,9 @@ def save_data(var='TSc'):
     c['TSc']=((c['FIRE']/(1*B))**0.25)
     g['TSc']=((g['FIRE']/(1*B))**0.25)
     
-    d_l = (g.TSc-c.TSc).mean(dim='time')
+    d_l = (g.TSc-c.TSc)
     d_total = get_total_effect()
-    d_nl=d_total.mean(dim='time')-d_l # nonlocal impact as residue
+    d_nl=d_total-d_l # nonlocal impact as residue
     d_final = xr.merge([d_l.rename(var+'_local'),d_nl.rename(var+'_nonlocal')])
 
     if var=='TSc':
@@ -24,7 +24,7 @@ def save_data(var='TSc'):
         d_final[var+'_local'].attrs = d0[var].attrs
         d_final[var+'_nonlocal'].attrs = d0[var].attrs
 
-    d_final.to_netcdf('../data/result/offline.%s.local20230327.nc'%var)
+    d_final.to_netcdf('../data/result/offline.%s.local_nonlocal.mon.nc'%var)
     print('data saved')
 
 if __name__=="__main__":
