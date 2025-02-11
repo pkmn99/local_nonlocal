@@ -97,14 +97,16 @@ def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
     dts=dts1+dts2+dts3
 
     local=dts.where((dts>ts_diff.quantile(0.001))&(dts<ts_diff.quantile(0.999))&(ra>0)&(bo>0)).mean(dim='time') # remove outliers
-    # multiply deforestation fraction
-    local = local * def_frac.values/100
+    # multiply deforestation fraction, weighted
+    local_w = local * def_frac.values/100
     nonlocal_tair=dts4.mean(dim='time')
-    nonlocal_tsc=ts_diff.mean(dim='time')-local
+    nonlocal_tsc=ts_diff.mean(dim='time')-local_w
     
-    d_final = xr.merge([local.rename('TSc_local'),nonlocal_tsc.rename('TSc_nonlocal'),nonlocal_tair.rename('Tair_nonlocal')])
+    d_final = xr.merge([local_w.rename('TSc_local'),local.rename('TSc_localuw'),nonlocal_tsc.rename('TSc_nonlocal'),nonlocal_tair.rename('Tair_nonlocal')])
     
-    d_final['TSc_local'].attrs = {'long name': 'calculated surface temperature from FIRE',
+    d_final['TSc_localuw'].attrs = {'long name': 'calculated surface temperature from FIRE',
+                                  'units':'K'}
+    d_final['TSc_local'].attrs = {'long name': 'calculated surface temperature from FIRE, multiply by deforestation fraction',
                                   'units':'K'}
     d_final['TSc_nonlocal'].attrs = {'long name': 'calculated surface temperature from FIRE',
                                      'units':'K'}
