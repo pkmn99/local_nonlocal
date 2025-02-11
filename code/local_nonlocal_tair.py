@@ -24,21 +24,17 @@ def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
     tair_c['lat']=d_total.lat
     tair_g['lat']=d_total.lat
     
-    dts4=tair_g-tair_c # changes in backgroud cliamte by Ta 
-    nonlocal_tair=dts4.mean(dim='time')
+    nonlocal_tair=tair_g-tair_c # changes in backgroud cliamte by Ta 
     
-    local=d_total.mean(dim='time')-nonlocal_tair
-    local_w = local # No need to multiply 
+    local=d_total-nonlocal_tair
 
-    d_final = xr.merge([local.rename('TSc_local'),local_w.rename('TSc_localw'),nonlocal_tair.rename('TSc_nonlocal')])
+    d_final = xr.merge([local.rename('TSc_local'),nonlocal_tair.rename('TSc_nonlocal')])
     
     d_final['TSc_local'].attrs = {'long name': 'calculated surface temperature from FIRE',
                                   'units':'K'}
-    d_final['TSc_localw'].attrs = {'long name': 'calculated surface temperature from FIRE, multiply by deforeatation fraction',
-                                  'units':'K'}
     d_final['TSc_nonlocal'].attrs = {'long name': 'derived from changes in bottom atmos tair',
                                      'units':'K'}
-    d_final.to_netcdf('../data/result/Tair.TSc.local_nonlocal.nc')
+    d_final.sel(time=slice('0006','0035')).to_netcdf('../data/result/Tair.TSc.local_nonlocal.mon.nc')
     print('data saved')
 
 if __name__=="__main__":
