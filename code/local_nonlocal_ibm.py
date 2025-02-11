@@ -6,11 +6,16 @@ def load_data(exp,var_group='clm2',time_scale='monthly'):
     d=xr.open_dataset('../data/outputdata/%s.%s.h0.0001-0035-%s.nc'%(exp,var_group,time_scale))
     return d
 
-def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
+def load_def_frac(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
+    exp_lookup={'F2000climo_Allgrass':'Allgrass','F2000climo_Allgrass_minimal_tree':'Allgrass_minimal_tree'}
     # Get the deforestation grid box
     lc0 = xr.open_dataset('../data/inputdata/surfdata_1.9x2.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190304_noirr.nc')
+    lc1 = xr.open_dataset('../data/inputdata/surfdata_1.9x2.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190304_noirr-%s.nc'%exp_lookup[exp1])
     # forest change fraction
-    def_frac=lc0.PCT_NAT_PFT[1:12,:,:].sum(dim='natpft')
+    def_frac=(lc0.PCT_NAT_PFT[1:12,:,:]-lc1.PCT_NAT_PFT[1:12,:,:]).sum(dim='natpft')
+    return def_frac
+
+def apply_ibm(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
 
     g_cam = load_data(exp1,var_group='cam',time_scale='monthly')
     c_cam = load_data(exp0,var_group='cam',time_scale='monthly')
@@ -95,13 +100,22 @@ def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
     dts4=tair_g-tair_c # changes in backgroud cliamte by Ta 
     
     dts=dts1+dts2+dts3
+    local=dts.where((dts>ts_diff.quantile(0.001))&(dts<ts_diff.quantile(0.999))&(ra>0)&(bo>0)) # remove outliers
+    return local,dts1,dts2,dts3,dts4,ts_diff
 
-    local=dts.where((dts>ts_diff.quantile(0.001))&(dts<ts_diff.quantile(0.999))&(ra>0)&(bo>0)).mean(dim='time') # remove outliers
-    # multiply deforestation fraction, weighted
+def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
+    # load forest change fraction
+    def_frac=load_def_frac(exp0=exp0,exp1=exp1)
+
+    # calculate ibm
+    [local,dts1,dts2,dts3,nonlocal_tair,ts_diff]=apply_ibm(exp0=exp0,exp1=exp1)
+
+    # local impact multiply deforestation fraction, weighted
     local_w = local * def_frac.values/100
-    nonlocal_tair=dts4.mean(dim='time')
-    nonlocal_tsc=ts_diff.mean(dim='time')-local_w
-    
+
+    # nonlocal impact 
+    nonlocal_tsc=ts_diff-local_w
+
     d_final = xr.merge([local_w.rename('TSc_local'),local.rename('TSc_localuw'),nonlocal_tsc.rename('TSc_nonlocal'),nonlocal_tair.rename('Tair_nonlocal')])
     
     d_final['TSc_localuw'].attrs = {'long name': 'calculated surface temperature from FIRE',
@@ -110,11 +124,11 @@ def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
                                   'units':'K'}
     d_final['TSc_nonlocal'].attrs = {'long name': 'calculated surface temperature from FIRE',
                                      'units':'K'}
-    d_final['Tair_nonlocal'].attrs = tair_c.attrs
+    d_final['Tair_nonlocal'].attrs = nonlocal_tair.attrs
     if exp0=='F2000climo_ctl':
-        d_final.to_netcdf('../data/result/ibm.TSc.local_nonlocal20250208.nc')
+        d_final.sel(time=slice('0006','0035')).to_netcdf('../data/result/ibm.TSc.local_nonlocal.mon.nc') # save last 30 years
     if exp0=='F2000climo_Allgrass':
-        d_final.to_netcdf('../data/result/ibm_r.TSc.local_nonlocal20250208.nc')
+        d_final.to_netcdf('../data/result/ibm_r.TSc.local_nonlocal.mon.nc')
     print('data saved')
 
 if __name__=="__main__":
