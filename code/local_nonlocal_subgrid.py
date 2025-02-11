@@ -33,12 +33,15 @@ def save_data(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass_minimal_tree',var=
     nf =  weighted_mean(d1y[12:15], lc.PCT_NAT_PFT[12:15])#nonforest in def run 
     f0 =  weighted_mean(d0y[1:12], lc.PCT_NAT_PFT[1:12]) #forest in control run
     
-    d_l=(nf-f)*def_frac.values/100 # local impact, mutiply by deforestation fraction
+    d_l=(nf-f) # local impact
+    d_lw=(nf-f)*def_frac.values/100 # local impact, mutiply by deforestation fraction
     d_nl=f-f0 # nonlocal impact
     
-    d_final = xr.merge([d_l.rename(var+'_local'),d_nl.rename(var+'_nonlocal')])
+    d_final = xr.merge([d_lw.rename(var+'_local'),d_l.rename(var+'_localuw'),d_nl.rename(var+'_nonlocal')])
     if var=='TSc':
-        d_final[var+'_local'].attrs = {'long name': 'calculated surface temperature from FIRE',
+        d_final[var+'_localuw'].attrs = {'long name': 'calculated surface temperature from FIRE',
+                                       'units':'K'}
+        d_final[var+'_local'].attrs = {'long name': 'calculated surface temperature from FIRE multiply by deforestation fraction',
                                        'units':'K'}
         d_final[var+'_nonlocal'].attrs = {'long name': 'calculated surface temperature from FIRE',
                                           'units':'K'}
