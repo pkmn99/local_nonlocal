@@ -54,17 +54,21 @@ def save_to_2d_360(fn_in, fn_out,var_list=['EFLX_LH_TOT','FSR', 'FSH']):
     print('file saved %s'%fn_out)
 
 if __name__=="__main__":
-    exp='I2000Clm50Sp_360x720cru'
-#    I2000Clm50Sp_360x720cru.clm2.h1.0015-12-31-00000.nc
+#    exp='I2000Clm50Sp_360x720cru'
+#    exp= 'I2000Clm50Sp_Allgrass_minimal_tree'
+#    exp= 'F2000climo_ctl'
+
+    exp='F2000climo_Allgrass_minimal_tree'
     time_scale='monthly'
-#    fn_in='../data/outputdata/%s.clm2.h1.0001-0035-%s.nc'%(exp,time_scale)
-#    fn_out='../data/outputdata/%s.clm2.h1.0001-0035-%s-2d.nc'%(exp,time_scale)
-#    fn_in='../data/outputdata/bowen_data/I2000Clm50Sp_360x720cru.clm2.h1.0006.monmean_day.nc'
+    fn_in='../data/outputdata/%s.clm2.h1.0001-0035-%s.nc'%(exp,time_scale)
+    fn_out='../data/outputdata/%s.clm2.h1.0001-0035-%s-2d.nc'%(exp,time_scale)
+    save_to_2d(fn_in, fn_out)
+
 #    fn_in='../data/outputdata/bowen_data/test_FSH_mean.nc'
 #    fn_out='../data/outputdata/bowen_data/test_FSH_mean_2d.nc'
-    fn_in='../data/outputdata/bowen_data/bowen_ratio_25_75_mean_1d.nc'
-    fn_out='../data/outputdata/bowen_data/bowen_ratio_25_75_mean_2d.nc'
-    save_to_2d_360(fn_in, fn_out,var_list=['FSH','EFLX_LH_TOT','BOWEN_RATIO'])
-    fn_in='../data/outputdata/bowen_data/bowen_ratio_25_75_median_1d.nc'
-    fn_out='../data/outputdata/bowen_data/bowen_ratio_25_75_median_2d.nc'
-    save_to_2d_360(fn_in, fn_out,var_list=['FSH','EFLX_LH_TOT','BOWEN_RATIO'])
+#    fn_in='../data/outputdata/bowen_data/bowen_ratio_25_75_mean_1d.nc'
+#    fn_out='../data/outputdata/bowen_data/bowen_ratio_25_75_mean_2d.nc'
+#    save_to_2d_360(fn_in, fn_out,var_list=['FSH','EFLX_LH_TOT','BOWEN_RATIO'])
+#    fn_in='../data/outputdata/bowen_data/bowen_ratio_25_75_median_1d.nc'
+#    fn_out='../data/outputdata/bowen_data/bowen_ratio_25_75_median_2d.nc'
+#    save_to_2d_360(fn_in, fn_out,var_list=['FSH','EFLX_LH_TOT','BOWEN_RATIO'])

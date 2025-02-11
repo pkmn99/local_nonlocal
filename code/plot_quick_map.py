@@ -2,10 +2,6 @@ import xarray as xr
 from scipy import stats
 import matplotlib.pyplot as plt
 
-import cartopy.io.shapereader as shpreader
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from cartopy.feature import ShapelyFeature
 
 #exp0='F2000climo_ctl'
 #exp='F2000climo_Allgrass'
@@ -44,6 +40,11 @@ def load_data(exp,exp0='F2000climo_ctl',var_group='clm2',time_scale='yearmean'):
     # Use shaply interface https://stackoverflow.com/questions/20990381/how-to-add-custom-shapefile-to-map-using-cartopy
     # with statistical values
 def plot_change_map(da0,da1, ax,minmax=[],sig=False):
+    import cartopy.io.shapereader as shpreader
+    import cartopy.crs as ccrs
+    import cartopy.feature as cfeature
+    from cartopy.feature import ShapelyFeature
+
     # Load geographical data
     # china_shp=shpreader.Reader('../../data/China_gis/administration/China_southsea.shp')
     # china_shp=shpreader.Reader('../../data/China_gis/administration/CN-sheng-A-test.shp')

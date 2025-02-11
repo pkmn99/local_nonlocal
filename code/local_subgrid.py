@@ -59,7 +59,7 @@ def save_data(var='TSc'):
     else:
         d_final[var+'_local'].attrs = d0[var].attrs
         d_final[var+'_nonlocal'].attrs = d0[var].attrs
-    d_final.sel(time=slice('0006','0035')).to_netcdf('../data/result/subgrid.%s.local.mon.nc'%var)
+    d_final.sel(time=slice('0006','0035')).to_netcdf('../data/result/subgrid_offline.%s.local_nonlocal.mon.nc'%var)
     print('data saved')
 
 if __name__=="__main__":

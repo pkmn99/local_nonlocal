@@ -7,7 +7,7 @@ def load_data(exp,var_group='clm2',time_scale='monthly'):
     return d
 
 def load_def_frac(exp0='F2000climo_ctl',exp1='F2000climo_Allgrass'):
-    exp_lookup={'F2000climo_Allgrass':'Allgrass','F2000climo_Allgrass_minimal_tree':'Allgrass_minimal_tree'}
+    exp_lookup={'F2000climo_Allgrass':'Allgrass','F2000climo_Allgrass_minimal_tree':'Allgrass_minimal_tree','F2000climo_Allgrass_checkerboard':'Allgrass_checkerboard'}
     # Get the deforestation grid box
     lc0 = xr.open_dataset('../data/inputdata/surfdata_1.9x2.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190304_noirr.nc')
     lc1 = xr.open_dataset('../data/inputdata/surfdata_1.9x2.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190304_noirr-%s.nc'%exp_lookup[exp1])
